@@ -1,15 +1,15 @@
-import { addFilter } from "@wordpress/hooks";
-import { createHigherOrderComponent } from "@wordpress/compose";
-import { InspectorControls } from "@wordpress/block-editor";
+import { addFilter } from '@wordpress/hooks';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { InspectorControls } from '@wordpress/block-editor';
 import {
-  PanelBody,
-  PanelRow,
-  ColorPalette,
-  ToggleControl,
-} from "@wordpress/components";
-import { __ } from "@wordpress/i18n";
-import { useSelect } from "@wordpress/data";
-import TokenList from "@wordpress/token-list";
+	PanelBody,
+	PanelRow,
+	ColorPalette,
+	ToggleControl,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import TokenList from '@wordpress/token-list';
 
 /**
  * Renders the edit component for the list block.
@@ -23,132 +23,134 @@ import TokenList from "@wordpress/token-list";
  * @return {JSX.Element} The rendered edit component.
  */
 function Edit({
-  attributes: { showMarker, markerColor, className },
-  setAttributes,
+	attributes: { showMarker, markerColor, className },
+	setAttributes,
 }) {
-  const updateColor = (newColor) => {
-    // Update Marker Color value.
-    setAttributes({
-      markerColor: newColor,
-    });
-  };
+	const updateColor = (newColor) => {
+		// Update Marker Color value.
+		setAttributes({
+			markerColor: newColor,
+		});
+	};
 
-  const updateMarkerToggle = (toggleState) => {
-    const currentClasses = new TokenList(className);
+	const updateMarkerToggle = (toggleState) => {
+		const currentClasses = new TokenList(className);
 
-    if (toggleState) {
-      currentClasses.add("cs-list");
-    } else {
-      currentClasses.remove("cs-list");
-    }
+		if (toggleState) {
+			currentClasses.add('cs-list');
+		} else {
+			currentClasses.remove('cs-list');
+		}
 
-    // Update Marker Toggle value, as well as the classname.
-    setAttributes({
-      showMarker: toggleState,
-      className: currentClasses.value,
-    });
-  };
+		// Update Marker Toggle value, as well as the classname.
+		setAttributes({
+			showMarker: toggleState,
+			className: currentClasses.value,
+		});
+	};
 
-  const themePalette = useSelect("core/block-editor").getSettings().colors;
+	const themePalette = useSelect('core/block-editor').getSettings().colors;
 
-  return (
-    <>
-      <InspectorControls>
-        <PanelBody title={__("Marker Color")}>
-          <PanelRow>
-            <ToggleControl
-              __nextHasNoMarginBottom
-              label={__("Display List Item Markers")}
-              checked={showMarker}
-              onChange={updateMarkerToggle}
-            />
-          </PanelRow>
-          {showMarker && (
-            <PanelRow>
-              <ColorPalette
-                colors={themePalette}
-                disableCustomColors={true}
-                value={markerColor}
-                onChange={updateColor}
-              />
-            </PanelRow>
-          )}
-        </PanelBody>
-      </InspectorControls>
-    </>
-  );
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={__('Marker Color')}>
+					<PanelRow>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={__('Display List Item Markers')}
+							checked={showMarker}
+							onChange={updateMarkerToggle}
+						/>
+					</PanelRow>
+					{showMarker && (
+						<PanelRow>
+							<ColorPalette
+								colors={themePalette}
+								disableCustomColors={true}
+								value={markerColor}
+								onChange={updateColor}
+							/>
+						</PanelRow>
+					)}
+				</PanelBody>
+			</InspectorControls>
+		</>
+	);
 }
 
 /**
  * Updates the list block render styles with our custom marker color variable, if set.
  */
 const addMarkerInlineStyleToListBlocks = createHigherOrderComponent(
-  (BlockListBlock) => {
-    return (props) => {
-      if (props.name !== "core/list") {
-        return <BlockListBlock {...props} />;
-      }
+	(BlockListBlock) => {
+		return (props) => {
+			if (props.name !== 'core/list') {
+				return <BlockListBlock {...props} />;
+			}
 
-      const customWrapperProps = {};
+			const customWrapperProps = {};
 
-      if (props.attributes.showMarker) {
-        customWrapperProps.style = {
-          "--wp--custom-marker-color": props.attributes.markerColor,
-        };
-      }
+			if (props.attributes.showMarker) {
+				customWrapperProps.style = {
+					'--wp--custom-marker-color': props.attributes.markerColor,
+				};
+			}
 
-      return <BlockListBlock {...props} wrapperProps={customWrapperProps} />;
-    };
-  },
-  "withInlineStyle"
+			return (
+				<BlockListBlock {...props} wrapperProps={customWrapperProps} />
+			);
+		};
+	},
+	'withInlineStyle'
 );
 
 addFilter(
-  "blocks.registerBlockType",
-  "cheffism/custom-marker-color",
-  (settings, name) => {
-    if (name !== "core/list") {
-      return settings;
-    }
+	'blocks.registerBlockType',
+	'cheffism/custom-marker-color',
+	(settings, name) => {
+		if (name !== 'core/list') {
+			return settings;
+		}
 
-    return {
-      ...settings,
-      attributes: {
-        ...settings.attributes,
-        markerColor: {
-          type: "string",
-          default: "",
-        },
-        showMarker: {
-          type: "boolean",
-          default: false,
-        },
-      },
-    };
-  }
+		return {
+			...settings,
+			attributes: {
+				...settings.attributes,
+				markerColor: {
+					type: 'string',
+					default: '',
+				},
+				showMarker: {
+					type: 'boolean',
+					default: false,
+				},
+			},
+		};
+	}
 );
 
 addFilter(
-  "editor.BlockEdit",
-  "cheffism/custom-marker-color",
-  createHigherOrderComponent((BlockEdit) => {
-    return (props) => {
-      if (props.name !== "core/list") {
-        return <BlockEdit {...props} />;
-      }
+	'editor.BlockEdit',
+	'cheffism/custom-marker-color',
+	createHigherOrderComponent((BlockEdit) => {
+		return (props) => {
+			if (props.name !== 'core/list') {
+				return <BlockEdit {...props} />;
+			}
 
-      return (
-        <>
-          <BlockEdit {...props} />
-          <Edit {...props} />
-        </>
-      );
-    };
-  })
+			return (
+				<>
+					<BlockEdit {...props} />
+					<Edit {...props} />
+				</>
+			);
+		};
+	})
 );
 
 addFilter(
-  "editor.BlockListBlock",
-  "cheffism/add-marker-inline-style-to-lists",
-  addMarkerInlineStyleToListBlocks
+	'editor.BlockListBlock',
+	'cheffism/add-marker-inline-style-to-lists',
+	addMarkerInlineStyleToListBlocks
 );
